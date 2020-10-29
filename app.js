@@ -27,6 +27,8 @@ connection.connect(function (err) {
               break;
             }
         });
+}
 
-
-  }
+function viewAll () {
+  let query = 'SELECT employee'
+}
