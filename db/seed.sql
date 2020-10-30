@@ -1,4 +1,4 @@
-USE employee_trackerDB,
+USE employee_trackerDB;
 
 -- DEPARTMENT SEEDS -----
 INSERT INTO department (name)
@@ -29,4 +29,8 @@ INSERT INTO employee (first_name, last_name, manager_id, role_id)
 VALUE ("Troy","Stratton",2,3);
 INSERT INTO employee (first_name, last_name, manager_id, role_id)
 VALUE ("Megan", "Dean", 1, 4);
+INSERT INTO employee (first_name, last_name, manager_id, role_id)
+VALUE ("Kristen", "Mardeusz", 3, 5);
+INSERT INTO employee (first_name, last_name, manager_id, role_id)
+VALUE ("Lindsey", "Schaberg", 4, 6);
 
