@@ -18,17 +18,24 @@ So that I can organize and plan my business
 
 
 ## Installation
-npm init -y
-npm i inquirer
-npm i mysql
-npm i console.table
+
+  * npm init -y
+
+  * npm i inquirer
+
+  * npm i mysql
+  
+  * npm i console.table
+
 
 ## Tech/framework used
-Javascript 
-jQuery 
-Node.js 
-MySQL 
-Inquirer
 
+  * Javascript
 
+  * jQuery 
 
+  * Node.js 
+  
+  * MySQL 
+  
+  * Inquirer
