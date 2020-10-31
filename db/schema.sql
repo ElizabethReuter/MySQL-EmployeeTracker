@@ -1,4 +1,4 @@
-CREATE DATABASE employeeDb;
+CREATE DATABASE employeeDb; 
 
 USE employeeDb;
 
