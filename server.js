@@ -58,7 +58,7 @@ function init() {
 		});
 }
 
-// Adds new department **Still need to complete**
+// Adds new department 
 function addNewDepartment(){
 	inquirer.prompt([
 		{
