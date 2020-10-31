@@ -69,17 +69,22 @@ function addNewDepartment(){
 	])
 	.then(function(departmentResult) {
 		var newDepartment = new Department(departmentResult.name);
-
-              }
-            );
-          
-            // logs the actual query being run
-          
+		connection.query(
+			"INSERT INTO department SET ?",
+			{
+			  name: newDepartment.name,
+			},
+			function(err) {
+			  if (err) throw err;
+			  console.log("Your department was added!");
+				init ();
+			});
+    });          
 }
 
-// Adds new role **Still need to complete**
+// Adds new role 
 function addNewRole(){
-	var departmentList = [{name: "Test Dept", value: 1}, {name: "Dept Test", value: 2}];
+	var departmentList = [{name: "Marketing", value: 1}, {name: "Sales", value: 2}, {name: "Accounting", value: 3}];
 
 	inquirer.prompt([
 		{
@@ -101,13 +106,24 @@ function addNewRole(){
 	])
 	.then(function(roleResult) {
 		var newRole = new Role(roleResult.title, roleResult.salary, roleResult.department_id);
-
+		connection.query(
+			"INSERT INTO role SET ?",
+			{
+			  title: newRole.title,
+			  salary: newRole.salary,
+			  department_id: newRole.department_id,
+			},
+			function(err) {
+			  if (err) throw err;
+			  console.log("Your role was added!");
+				init ();
+			});
 	});
 }
 
-// Adds new employee **Still need to complete**
+// Adds new employee 
 function addNewEmployee(){
-	var roleList = [{name: "Test Role", value: 1}, {name: "Role Test", value: 2}];
+	var roleList = [{name: "Marketing Person", value: 1}, {name: "Sales Person", value: 2}, , {name: "Accountant", value: 3} ];
 	var employeeList = [{name: "None", value: null}];
 
 	inquirer.prompt([
@@ -130,13 +146,30 @@ function addNewEmployee(){
 		{
 			type: "list",
 			name: "manager_id",
-			message: "who is the employee's role?",
+			message: "Who is the employee's manager?",
 			choices: employeeList
 		}
 	])
 	.then(function(employeeResult) {
 		var newEmployee = new Employee(employeeResult.first_name, employeeResult.last_name, employeeResult.role_id, employeeResult.manager_id);
-
+		console.log(newEmployee.manager_id);
+		if (newEmployee.manager_id === null) {
+			newEmployee.manager_id = 5;
+		}
+		console.log(newEmployee.manager_id);
+		connection.query(
+			"INSERT INTO employee SET ?",
+			{
+			  first_name: newEmployee.first_name,
+			  last_name: newEmployee.last_name,
+			  role_id: newEmployee.role_id,
+			  manager_id: newEmployee.manager_id,
+			},
+			function(err) {
+			  if (err) throw err;
+			  console.log("Your employee was added!");
+				init ();
+			});
 	});
 }
 
@@ -145,7 +178,7 @@ function viewDepartments(){
     connection.query("SELECT * FROM department", function(err, data) {
         if (err) throw err;
         console.table(data);
-
+		init ();
       });
 
 }
@@ -160,11 +193,9 @@ function viewRoles(){
     connection.query(sql, function(err, data) {
         if (err) {
             throw err;
-        
         }
-        console.table(data);
-    
-        // console.log(data[0].RESULT);
+		console.table(data);
+		init ();
       });
 }
 
@@ -173,15 +204,26 @@ function viewEmployees(){
     connection.query("SELECT * FROM employee", function(err, data) {
         if (err) throw err;
         console.table(data);
-
+		init();
       });
 
 }
 
-// update Employee Role **Still need to complete**
-function updateEmployeeRole(){
-
-}
-
+// update Employee Role **still not able to figure out.
+// function updateEmployeeRole(){
+// 	var updateEmployee = new Employee(employeeResult.first_name, employeeResult.last_name, employeeResult.role_id, employeeResult.manager_id);
+// 	connection.query(
+// 		"UPDATE employee SET ?",
+// 		[
+// 		  {
+// 			role_id: updateEmployee.role_id
+// 		  },
+// 		],
+// 		function(error) {
+// 		  if (error) throw err;
+// 		  console.log("Employee was updated!");
+// 		  init();
+// 	});
+// }
 
 init();
