@@ -33,7 +33,7 @@ VALUES (NULL, 'Marketing');
 INSERT INTO department (id, name)
 VALUES (NULL, 'Sales');
 INSERT INTO department (id, name)
-VALUES (NULL, 'Accounting');
+VALUES (NULL, 'Accounting'); 
 
 INSERT INTO role (id, title, salary, department_id)
 VALUES (NULL, 'Market Jr', 50000, 1);

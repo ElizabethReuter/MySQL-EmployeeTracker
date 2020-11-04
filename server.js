@@ -187,7 +187,7 @@ function viewDepartments(){
         if (err) throw err;
         console.table(data);
 		init ();
-      });
+	      });
 
 }
 
