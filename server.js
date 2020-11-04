@@ -1,4 +1,4 @@
-// install Dependencies  
+// install dependencies
 const Department = require("./lib/Department");
 const Role = require("./lib/Role");
 const Employee = require("./lib/Employee");
@@ -13,7 +13,7 @@ var connection = mysql.createConnection({
     user: "root",
     password: "password",
     database: "employeeDb"
-  }); 
+  });
 
 
 connection.connect(function(err) {
@@ -38,10 +38,21 @@ function init() {
 				addNewDepartment();
 			}
             else if ( response.doWhat === "Add Role" ){
-				addNewRole();
+				connection.query("SELECT name, id AS value FROM department", function(err, data) {
+					if (err) throw err;
+					addNewRole(data);
+				  });
+				
             }
             else if ( response.doWhat === "Add Employee" ){
-				addNewEmployee();
+				connection.query("SELECT title AS name, id AS value FROM role", function(err, roleData) {
+					if (err) throw err;
+					connection.query("SELECT CONCAT(first_name,' ', last_name) AS name, id AS value FROM employee", function(err, empData) {
+						if (err) throw err;
+						empData.push({name:"none", value:null});
+					addNewEmployee(roleData,empData);
+					});
+				});
             }
             else if ( response.doWhat === "View Departments" ){
 				viewDepartments();
@@ -53,7 +64,13 @@ function init() {
 				viewEmployees();
             }
             else if ( response.doWhat === "Update Employee Role" ){
-				updateEmployeeRole();
+				connection.query("SELECT title AS name, id AS value FROM role", function(err, roleData) {
+					if (err) throw err;
+				connection.query("SELECT CONCAT(first_name,' ', last_name) AS name, id AS value FROM employee", function(err, empData) {
+						if (err) throw err;
+					updateEmployeeRole(roleData,empData);
+				});
+				});
             }
 		});
 }
@@ -82,10 +99,8 @@ function addNewDepartment(){
     });          
 }
 
-// Adds new role 
-function addNewRole(){
-	var departmentList = [{name: "Marketing", value: 1}, {name: "Sales", value: 2}, {name: "Accounting", value: 3}];
-
+// Adds new role  
+function addNewRole(departmentList){
 	inquirer.prompt([
 		{
 			type: "input",
@@ -122,9 +137,7 @@ function addNewRole(){
 }
 
 // Adds new employee 
-function addNewEmployee(){
-	var roleList = [{name: "Marketing Person", value: 1}, {name: "Sales Person", value: 2}, , {name: "Accountant", value: 3} ];
-	var employeeList = [{name: "None", value: null}];
+function addNewEmployee(roleList,employeeList){
 
 	inquirer.prompt([
 		{
@@ -152,11 +165,6 @@ function addNewEmployee(){
 	])
 	.then(function(employeeResult) {
 		var newEmployee = new Employee(employeeResult.first_name, employeeResult.last_name, employeeResult.role_id, employeeResult.manager_id);
-		console.log(newEmployee.manager_id);
-		if (newEmployee.manager_id === null) {
-			newEmployee.manager_id = 5;
-		}
-		console.log(newEmployee.manager_id);
 		connection.query(
 			"INSERT INTO employee SET ?",
 			{
@@ -186,44 +194,65 @@ function viewDepartments(){
 // Query search to view all roles using inner join from department table and role table. 
 function viewRoles(){
     // variable that concatenates the inner join my sql command
-    var sql="SELECT role.title, role.salary, department.name AS departmentName FROM role";
+    var sql="SELECT department.name AS departmentName, role.title, role.salary FROM role";
     sql+=" INNER JOIN department";
     sql+=" ON (department.id=role.department_id)";
     sql+=" ORDER BY department.name, role.title"; 
     connection.query(sql, function(err, data) {
         if (err) {
             throw err;
+        
         }
-		console.table(data);
+        console.table(data);
 		init ();
+        // console.log(data[0].RESULT);
       });
 }
 
 // Query search to view all employees
 function viewEmployees(){
-    connection.query("SELECT * FROM employee", function(err, data) {
+	var sql="SELECT CONCAT(emp1.first_name,' ', emp1.last_name) AS employee_name, role.title, CONCAT(mgr.first_name,' ', mgr.last_name) AS manager_name FROM employee emp1";
+	sql+=" INNER JOIN role";
+	sql+=" ON (role.id=emp1.role_id)";
+	sql+=" LEFT OUTER JOIN employee mgr";
+	sql+=" ON (mgr.id=emp1.manager_id)";
+	sql+=" ORDER BY manager_name, employee_name";
+    connection.query(sql, function(err, data) {
         if (err) throw err;
         console.table(data);
-		init();
+		init ();
       });
 
 }
 
-// update Employee Role **still not able to figure out.
-// function updateEmployeeRole(){
-// 	var updateEmployee = new Employee(employeeResult.first_name, employeeResult.last_name, employeeResult.role_id, employeeResult.manager_id);
-// 	connection.query(
-// 		"UPDATE employee SET ?",
-// 		[
-// 		  {
-// 			role_id: updateEmployee.role_id
-// 		  },
-// 		],
-// 		function(error) {
-// 		  if (error) throw err;
-// 		  console.log("Employee was updated!");
-// 		  init();
-// 	});
-// }
+// update Employee Role 
+function updateEmployeeRole(roleList, employeeList){
+	inquirer.prompt([
+		{
+			type: "list",
+			name: "employee_id",
+			message: "Which employee would you like to update?",
+			choices: employeeList
+		},
+		{
+			type: "list",
+			name: "role_id",
+			message: "What is this employee's new role?",
+			choices: roleList
+		},
+	])
+	.then(function(updatedResult) {
+		let data=[{role_id:updatedResult.role_id},{id:updatedResult.employee_id},];
+		connection.query(
+			'UPDATE employee SET ? WHERE ?',
+			data,
+			function(err,res) {
+			  if (err) throw err;
+			  console.log(res.affectedRows + "Your employee was updated!\n");
+				init ();
+			});
+	});
+}
+
 
 init();
